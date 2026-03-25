@@ -11,35 +11,37 @@ def train_model(X_train, y_train):
     return model
 
 
-if __name__ == "__main__":
-    print("Starting pipeline...\n")
-
+def run_training(data_path: str = "data.csv"):
     # 1. Load Data
-    df = load_data("data.csv")
-    print("Data loaded")
+    df = load_data(data_path)
 
     # 2. Preprocess
     X, y = preprocess_data(df)
-    print("Data preprocessed")
 
     # 3. Split + Scale
     X_train, X_test, y_train, y_test = split_and_scale(X, y)
-    print("Data split and scaled")
 
     # 4. Train
     model = train_model(X_train, y_train)
-    print("Model trained")
 
     # 5. Evaluate
     mae, mse, r2 = evaluate_model(model, X_test, y_test)
 
-    print("\nEvaluation Results:")
-    print(f"MAE: {mae}")
-    print(f"MSE: {mse}")
-    print(f"R2 Score: {r2}")
-
+    # Save artifacts for the Streamlit frontend.
     with open("model.pkl", "wb") as f:
         pickle.dump(model, f)
+
+    return {"mae": mae, "mse": mse, "r2": r2}
+
+
+if __name__ == "__main__":
+    print("Starting pipeline...\n")
+    metrics = run_training("data.csv")
+
+    print("\nEvaluation Results:")
+    print(f"MAE: {metrics['mae']}")
+    print(f"MSE: {metrics['mse']}")
+    print(f"R2 Score: {metrics['r2']}")
 
     print("\nModel saved as model.pkl")
     print("Pipeline completed successfully!")
